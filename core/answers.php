@@ -56,8 +56,9 @@ class QA_Answers {
 
     function admin_enqueue_scripts( $hook ) {
         global $post;
-        if ( 'edit.php' != $hook || (isset($post) && $post->post_type != 'answer') )
+        if ( 'edit.php' != $hook || (isset($post) && $post->post_type != 'answer') ) {
             return;
+        }
         wp_enqueue_style('qa-answers-remove-add');
     }
 
@@ -69,8 +70,9 @@ class QA_Answers {
                 'question' => $args['question'],
             ));
 
-            if ( !$question )
+            if ( !$question ) {
                 return array( 'error' => 404 );
+            }
 
             $this->question = reset($question);
 
@@ -88,8 +90,9 @@ class QA_Answers {
 
     // Prevent redirect on paginated answers
     function redirect_canonical( $redirect_url, $requested_url ) {
-        if ( is_singular('question') && is_paged() )
+        if ( is_singular('question') && is_paged() ) {
             return false;
+        }
 
         return $redirect_url;
     }

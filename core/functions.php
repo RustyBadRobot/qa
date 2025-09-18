@@ -29,10 +29,11 @@ function is_qa_page( $type = '' ) {
 	}
 
 	// Check if any flags are true
-	if ( empty( $type ) )
-		$result = in_array( true, $flags );
-	else
-		$result = isset( $flags[ $type ] ) && $flags[ $type ];
+        if ( empty( $type ) ) {
+                $result = in_array( true, $flags );
+        } else {
+                $result = isset( $flags[ $type ] ) && $flags[ $type ];
+        }
 	
 	return apply_filters( 'is_qa_page', $result, $type );
 }
@@ -101,8 +102,9 @@ function qa_get_url( $type, $id = 0 ) {
 }
 
 function is_question_answered( $question_id = 0, $type = 'any' ) {
-	if ( !$question_id )
-		$question_id = get_the_ID();
+        if ( !$question_id ) {
+                $question_id = get_the_ID();
+        }
 
 	if ( 'accepted' == $type ) {
 		return apply_filters( 'qa_is_question_answered', get_post_meta( $question_id, '_accepted_answer', true ));
@@ -112,9 +114,11 @@ function is_question_answered( $question_id = 0, $type = 'any' ) {
 }
 
 function get_answer_count( $question_id ) {
-	$count = (int)get_post_meta( $question_id, '_answer_count', true );
+        $count = (int)get_post_meta( $question_id, '_answer_count', true );
 
-	if($count < 0) update_post_meta( $question_id, '_answer_count', 0);
+        if($count < 0) {
+                update_post_meta( $question_id, '_answer_count', 0);
+        }
 
 	return $count;
 }
@@ -183,24 +187,29 @@ function _qa_html( $tag ) {
  */
 	function qa_update_14() {
 		$version = get_option('qa_installed_version');
-		if ( $version == QA_VERSION )
+		if ( $version == QA_VERSION ) {
 			return;
+		}
+
 
 		// Just update version number if theme is already supported
-		if ( strpos( qa_supported_themes(), get_template() ) !== false )
+		if ( strpos( qa_supported_themes(), get_template() ) !== false ) {
 			$supported_theme = true;
-		else
+		} else {
 			$supported_theme = false;
+		}
 
-		if ( !$options = get_option( QA_OPTIONS_NAME ) )
+		if ( !$options = get_option( QA_OPTIONS_NAME ) ) {
 			$options = array();
+		}
 
 		$changed = false;
-		if ( !isset( $options["general_settings"]["page_layout"] ) ) {
-			if ( isset( $options["general_settings"]["full_width"] ) && $options["general_settings"]["full_width"] )
-				$options["general_settings"]["page_layout"] = 'content';
-			else
-				$options["general_settings"]["page_layout"] = 'content-sidebar';
+                if ( !isset( $options["general_settings"]["page_layout"] ) ) {
+                        if ( isset( $options["general_settings"]["full_width"] ) && $options["general_settings"]["full_width"] ) {
+                                $options["general_settings"]["page_layout"] = 'content';
+                        } else {
+                                $options["general_settings"]["page_layout"] = 'content-sidebar';
+                        }
 
 			unset( $options["general_settings"]["full_width"] );
 			$changed = true;
