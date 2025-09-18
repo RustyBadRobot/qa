@@ -8,6 +8,11 @@
  * @license GNU General Public License (Version 2 - GPLv2) {@link http://www.gnu.org/licenses/gpl-2.0.html}
  */
 class QA_Core_Admin extends QA_Core {
+	
+	// Declare classes properties
+    public $page;
+	public $plugin_name;
+	
 	/** @var array Holds all capability names, along with descriptions. */
 	var $capability_map;
 
@@ -17,7 +22,7 @@ class QA_Core_Admin extends QA_Core {
 	/**
 	 * Constructor.
 	 */
-	function __construct() {
+	public function __construct() {
 		// Settings page ID
 		$this->page = 'question_page_qa_settings';
 
@@ -50,7 +55,7 @@ class QA_Core_Admin extends QA_Core {
 	 *
 	 * @return void
 	 */
-	function init() {
+	public function init() {
 
 		qa_update_14();
 
@@ -888,7 +893,7 @@ class QA_Core_Admin extends QA_Core {
 			}
 		}
 
-		if ( ! $qa_cap_set && preg_match( '/(_question|_questions|_answer|_answers)/i', join( $caps, ',' ) ) > 0 ) {
+		if ( ! $qa_cap_set && preg_match( '/(_question|_questions|_answer|_answers)/i', implode( ',', $caps  ) ) > 0 ) {
 			if ( in_array( 'administrator', $current_user->roles ) ) {
 				foreach ( $caps as $cap ) {
 					$allcaps[ $cap ] = 1;

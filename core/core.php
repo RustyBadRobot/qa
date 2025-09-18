@@ -5,8 +5,12 @@
  * V1.4.2.1
  */
 class QA_Core {
+	
+	// Declare classes properties
+    public $g_settings;
 
-	function __construct() {
+	public function __construct() {
+		
 		$this->g_settings = $this->get_options( 'general_settings' );
 
 		// Pagination
