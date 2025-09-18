@@ -94,12 +94,12 @@ class QA_Answers {
         return $redirect_url;
     }
 
-    function wp_title_rss() {
+    function wp_title_rss( $current_title = '', $feed = '' ) {
         $sep = '&#187;'; // http://core.trac.wordpress.org/ticket/16983
         return " $sep " . sprintf(__('Answers for "%s"', QA_TEXTDOMAIN), $this->question->post_title);
     }
 
-    function answer_title_rss() {
+    function answer_title_rss( $title = '' ) {
         return sprintf(__('By: %s', QA_TEXTDOMAIN), get_the_author());
     }
 

@@ -1,4 +1,8 @@
 ﻿== Changelog ==
+= 1.4.5.3 = 2024-04-27
+- Update hook callback signatures for PHP 8 compatibility and WordPress 6.8 expectations.
+- Replace deprecated user meta APIs and document PHP 8 support.
+
 = 1.4.5.1 = 2016-05-22
 - Fix BuddyPress Q&A page caused fatal error
 - Fix answer form displayed on other post types

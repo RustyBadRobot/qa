@@ -98,8 +98,8 @@ class QA_Core_Admin extends QA_Core {
 	 * Adds metabox for reported q & a
 	 * Since v1.3.1
 	 */
-	function add_metabox() {
-		global $wpdb, $post;
+	function add_metabox( $post_type = '', $post = null ) {
+		global $wpdb;
 		// Display only for reported q & a
 		if ( ! is_object( $post ) || ! $post->ID ) {
 			return;
@@ -135,8 +135,7 @@ class QA_Core_Admin extends QA_Core {
 	 * Html codes for report metabox
 	 * Since v1.3.1
 	 */
-	function print_metabox() {
-		global $post;
+	function print_metabox( $post, $metabox = null ) {
 
 		if ( ! is_object( $post ) || ! $post->ID ) {
 			return;
@@ -251,11 +250,12 @@ class QA_Core_Admin extends QA_Core {
 	 * Added Question column v1.4.2.2
 	 */
 	function show_column( $name ) {
+		global $post;
+
 		if ( ! in_array( $name, array( 'qa-reported', 'qa-question' ) ) ) {
 			return;
 		}
 
-		global $post;
 
 		switch ( $name ) {
 			case 'qa-reported': {
@@ -606,7 +606,7 @@ class QA_Core_Admin extends QA_Core {
 	/**
 	 * Display notification settings in user profile
 	 */
-	function show_user_profile() {
+	function show_user_profile( $user ) {
 		if ( ! current_user_can( 'subscribe_to_new_questions' ) ) {
 			return;
 		}
@@ -621,18 +621,15 @@ class QA_Core_Admin extends QA_Core {
 	/**
 	 * Save notification settings when the user profile is updated
 	 */
-	function profile_update() {
+	function profile_update( $user_id, $old_user_data = null ) {
 		if ( ! current_user_can( 'subscribe_to_new_questions' ) ) {
 			return;
 		}
 
-		global $wpdb;
-		$user_id = $_REQUEST['user_id'];
-
 		if ( isset( $_POST['qa_notification'] ) ) {
-			update_usermeta( $user_id, 'qa_notification', $_POST['qa_notification'] );
+			update_user_meta( $user_id, 'qa_notification', $_POST['qa_notification'] );
 		} else {
-			update_usermeta( $user_id, 'qa_notification', 0 );
+			update_user_meta( $user_id, 'qa_notification', 0 );
 		}
 	}
 
