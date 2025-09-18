@@ -55,7 +55,7 @@ class QA_Core {
 		add_action( 'wp_ajax_qa_flag', array( &$this, 'qa_flag' ) );
 	}
 
-	function add_custom_content_before_loop() {
+	function add_custom_content_before_loop( $query = null ) {
 		global $post, $wp;
 
 		if ( ( ( in_the_loop() && get_post_type( $post ) == 'question' ) || in_the_loop() && isset( $wp->query_vars['qa_ask'] ) ) && ! isset( $wp->query_vars['s'] ) ) {
@@ -562,7 +562,7 @@ class QA_Core {
 		}
 	}
 
-	function loop_start() {
+	function loop_start( $query = null ) {
 		global $wp_query;
 		if ( is_single() && in_the_loop() && $wp_query->post->post_type == 'question' ) {
 			add_filter( 'the_title', array( &$this, 'single_title' ) );

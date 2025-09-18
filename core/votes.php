@@ -15,7 +15,7 @@ class QA_Votes {
 			add_filter( 'posts_clauses', array( &$this, 'posts_clauses' ), 10, 2 );
 	}
 
-	function bp_before_member_header_meta() {
+	function bp_before_member_header_meta( $user_id = 0, $user_nicename = '', $args = array() ) {
 		global $bp;
 
 		echo sprintf(__('<span class="qa qa-rep activity">QA rep %d</span>', QA_TEXTDOMAIN), number_format_i18n( qa_get_user_rep(  bp_displayed_user_id() ) ));
