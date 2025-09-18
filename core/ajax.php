@@ -18,12 +18,13 @@ class QA_AJAX {
 		$id = $_POST['post_id'];
 		$post_type = get_post_type( $id );
 
-		if ( 'question' == $post_type )
-			the_question_voting( $id );
-		elseif ( 'answer' == $post_type )
-			the_answer_voting( $id );
-		else
-			die( -1 );
+                if ( 'question' == $post_type ) {
+                        the_question_voting( $id );
+                } elseif ( 'answer' == $post_type ) {
+                        the_answer_voting( $id );
+                } else {
+                        die( -1 );
+                }
 		die;
 	}
 

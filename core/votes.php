@@ -11,8 +11,9 @@ class QA_Votes {
 		add_action( 'transition_post_status', array( &$this, 'update_reps' ), 10, 3 );
 		add_action( 'bp_before_member_header_meta', array( &$this, 'bp_before_member_header_meta' ), 10, 3 );
 
-		if ( !is_admin() )
-			add_filter( 'posts_clauses', array( &$this, 'posts_clauses' ), 10, 2 );
+                if ( !is_admin() ) {
+                        add_filter( 'posts_clauses', array( &$this, 'posts_clauses' ), 10, 2 );
+                }
 	}
 
 	function bp_before_member_header_meta( $user_id = 0, $user_nicename = '', $args = array() ) {
@@ -51,10 +52,11 @@ class QA_Votes {
 			'class' => "vote-$vote_type-" . ( $voted ? 'on' : 'off' )
 		);
 
-		if ( !is_user_logged_in() )
-			$input_attr['data-msg'] = 'login';
-		elseif ( get_post_field( 'post_author', $id ) == get_current_user_id() )
-			$input_attr['data-msg'] = 'own';
+                if ( !is_user_logged_in() ) {
+                        $input_attr['data-msg'] = 'login';
+                } elseif ( get_post_field( 'post_author', $id ) == get_current_user_id() ) {
+                        $input_attr['data-msg'] = 'own';
+                }
 
 		ob_start();
 ?>
@@ -84,12 +86,14 @@ class QA_Votes {
 		$user_id = get_current_user_id();
 
 		// Don't allow votes on one's own content
-		if ( $author == $user_id )
-			return false;
+                if ( $author == $user_id ) {
+                        return false;
+                }
 
-		// Check capability
-		if ( !current_user_can( 'read', $id ) )
-			return;
+                // Check capability
+                if ( !current_user_can( 'read', $id ) ) {
+                        return;
+                }
 
 		$this->remove( $id, false );
 
@@ -135,12 +139,13 @@ class QA_Votes {
 
 		$user_id = get_current_user_id();
 
-		if ( in_array( $user_id, $up ) )
-			$current = 'up';
-		elseif ( in_array( $user_id, $down ) )
-			$current = 'down';
-		else
-			$current = false;
+                if ( in_array( $user_id, $up ) ) {
+                        $current = 'up';
+                } elseif ( in_array( $user_id, $down ) ) {
+                        $current = 'down';
+                } else {
+                        $current = false;
+                }
 
 		return array( count( $up ), count( $down ), $current );
 	}
@@ -153,8 +158,9 @@ class QA_Votes {
 
 		$post_types = array_intersect( (array) $wp_query->get( 'post_type' ), array( 'question', 'answer' ) );
 
-		if ( empty( $post_types ) || 'none' == $wp_query->get('qa_count') )
-			return $clauses;
+                if ( empty( $post_types ) || 'none' == $wp_query->get('qa_count') ) {
+                        return $clauses;
+                }
 
 		$clauses['fields'] .= ", COUNT(up.meta_value) - COUNT(down.meta_value) AS qa_score";
 		$clauses['join'] .= "
@@ -163,8 +169,9 @@ class QA_Votes {
 		";
 		$clauses['groupby'] = "$wpdb->posts.ID";
 
-		if ( isset( $wp_query->query['orderby'] ) && 'qa_score' == $wp_query->query['orderby'] )
-			$clauses['orderby'] = "qa_score DESC, post_date ASC";
+                if ( isset( $wp_query->query['orderby'] ) && 'qa_score' == $wp_query->query['orderby'] ) {
+                        $clauses['orderby'] = "qa_score DESC, post_date ASC";
+                }
 
 		return $clauses;
 	}
@@ -173,31 +180,36 @@ class QA_Votes {
 	 * Handle voting and unvoting.
 	 */
 	function handle_voting() {
-		if ( !isset( $_POST['action'] ) || 'qa_vote' != $_POST['action'] )
-			return;
+                if ( !isset( $_POST['action'] ) || 'qa_vote' != $_POST['action'] ) {
+                        return;
+                }
 
-		if ( !isset( $_POST['_wpnonce'] ) || !wp_verify_nonce( $_POST['_wpnonce'], 'qa_vote' ) )
-			return;
+                if ( !isset( $_POST['_wpnonce'] ) || !wp_verify_nonce( $_POST['_wpnonce'], 'qa_vote' ) ) {
+                        return;
+                }
 
 		$id = $_POST['post_id'];
 
 		$vote_type = $_POST['vote_type'];
 
-		if ( 'undo' == $vote_type )
-			$this->remove( $id );
-		else
-			$this->add( $id, $vote_type );
+                if ( 'undo' == $vote_type ) {
+                        $this->remove( $id );
+                } else {
+                        $this->add( $id, $vote_type );
+                }
 	}
 
 	/**
 	 * Handle accepting answers.
 	 */
 	function handle_accepting() {
-		if ( !isset( $_POST['action'] ) || 'qa_accept' != $_POST['action'] )
-			return;
+                if ( !isset( $_POST['action'] ) || 'qa_accept' != $_POST['action'] ) {
+                        return;
+                }
 
-		if ( !isset( $_POST['_wpnonce'] ) || !wp_verify_nonce( $_POST['_wpnonce'], 'qa_accept' ) )
-			return;
+                if ( !isset( $_POST['_wpnonce'] ) || !wp_verify_nonce( $_POST['_wpnonce'], 'qa_accept' ) ) {
+                        return;
+                }
 
 		$answer_id = (int) $_POST['answer_id'];
 
@@ -217,11 +229,12 @@ class QA_Votes {
 	 * Update user reps when a post is unpublished.
 	 */
 	function update_reps( $new_status, $old_status, $post ) {
-		if (
-			!in_array( $post->post_type, array( 'question', 'answer' ) )
-			|| 'publish' != $old_status || $new_status == $old_status
-		)
-			return;
+                if (
+                        !in_array( $post->post_type, array( 'question', 'answer' ) )
+                        || 'publish' != $old_status || $new_status == $old_status
+                ) {
+                        return;
+                }
 
 		$this->update_user_rep( $post->post_author );
 

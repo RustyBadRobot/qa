@@ -72,8 +72,9 @@ function the_qa_menu() {
 }
 
 function get_the_qa_error_notice() {
-	if ( !isset( $_GET[ 'qa_error' ] ) )
-		return;
+        if ( !isset( $_GET[ 'qa_error' ] ) ) {
+                return;
+        }
 	$out = '';
 	$out .= '<div id="qa-error-notice">';
 	$out .= __( 'An error has occured while processing your submission.', QA_TEXTDOMAIN );
@@ -101,11 +102,13 @@ function the_qa_search_form() {
 
 function get_the_qa_pagination( $query = null ) {
 
-	if ( is_null( $query ) )
-		$query = $GLOBALS[ 'wp_query' ];
+        if ( is_null( $query ) ) {
+                $query = $GLOBALS[ 'wp_query' ];
+        }
 
-	if ( $query->max_num_pages <= 1 )
-		return;
+        if ( $query->max_num_pages <= 1 ) {
+                return;
+        }
 
 	$out = '';
 
@@ -118,30 +121,37 @@ function get_the_qa_pagination( $query = null ) {
 
 	$out .= '<div class="qa-pagination">';
 
-	if ( $current_page > 1 )
-		$out .= get_qa_single_page_link( $query, $current_page - 1, __( 'prev', QA_TEXTDOMAIN ), 'prev' );
+        if ( $current_page > 1 ) {
+                $out .= get_qa_single_page_link( $query, $current_page - 1, __( 'prev', QA_TEXTDOMAIN ), 'prev' );
+        }
 
-	if ( $range_start > 1 )
-		$out .= get_qa_single_page_link( $query, 1 );
+        if ( $range_start > 1 ) {
+                $out .= get_qa_single_page_link( $query, 1 );
+        }
 
-	if ( $range_start > $padding )
-		$out .= '<span class="dots">...</span>';
+        if ( $range_start > $padding ) {
+                $out .= '<span class="dots">...</span>';
+        }
 
 	foreach ( range( $range_start, $range_finish ) as $num ) {
-		if ( $num == $current_page )
-			$out .= _qa_html( 'span', array( 'class' => 'current' ), number_format_i18n( $num ) );
-		else
-			$out .= get_qa_single_page_link( $query, $num );
-	}
+                if ( $num == $current_page ) {
+                        $out .= _qa_html( 'span', array( 'class' => 'current' ), number_format_i18n( $num ) );
+                } else {
+                        $out .= get_qa_single_page_link( $query, $num );
+                }
+        }
 
-	if ( $range_finish + $padding <= $total_pages )
-		$out .= '<span class="dots">...</span>';
+        if ( $range_finish + $padding <= $total_pages ) {
+                $out .= '<span class="dots">...</span>';
+        }
 
-	if ( $range_finish < $total_pages )
-		$out .= get_qa_single_page_link( $query, $total_pages );
+        if ( $range_finish < $total_pages ) {
+                $out .= get_qa_single_page_link( $query, $total_pages );
+        }
 
-	if ( $current_page < $total_pages )
-		$out .= get_qa_single_page_link( $query, $current_page + 1, __( 'next', QA_TEXTDOMAIN ), 'next' );
+        if ( $current_page < $total_pages ) {
+                $out .= get_qa_single_page_link( $query, $current_page + 1, __( 'next', QA_TEXTDOMAIN ), 'next' );
+        }
 
 	$out .= '</div>';
 
@@ -153,13 +163,15 @@ function the_qa_pagination( $query = null ) {
 }
 
 function get_qa_single_page_link( $query, $num, $title = '', $class = '' ) {
-	if ( !$title )
-		$title = number_format_i18n( $num );
+        if ( !$title ) {
+                $title = number_format_i18n( $num );
+        }
 
 	$args = array( 'href' => get_pagenum_link( $num ) );
 
-	if ( $class )
-		$args[ 'class' ] = $class;
+        if ( $class ) {
+                $args[ 'class' ] = $class;
+        }
 
 	return apply_filters( 'qa_single_page_link', _qa_html( 'a', $args, $title ) );
 }
@@ -175,10 +187,11 @@ function get_the_qa_time( $id ) {
 
 	$time_diff = time() - $time;
 
-	if ( $time_diff > 0 && $time_diff < 24 * 60 * 60 )
+	if ( $time_diff > 0 && $time_diff < 24 * 60 * 60 ) {
 		$h_time	 = sprintf( __( '%s ago', QA_TEXTDOMAIN ), human_time_diff( $time ) );
-	else
+	} else {
 		$h_time	 = mysql2date( get_option( 'date_format' ), $post->post_date );
+	}
 
 	$h_time = apply_filters( 'qa_time', $h_time, $time );
 	return '<span class="qa-timediff">' . $h_time . '</span>';
@@ -229,8 +242,9 @@ function get_the_qa_action_links( $id ) {
 	foreach ( $links as $type => $title ) {
 		if ( 'flag' == $type ) {
 			$flag_link		 = '<a name="qa_report" href="javascript:void(0)" onClick="javascript:document.getElementById(\'qa_flag_form_' . $id . '\').style.display=\'block\';" >' . $title . '</a>';
-			if ( isset( $_GET[ 'flag_received' ] ) )
-				$links[ 'flag' ] = '<span style="color:green">' . __( 'Your report has been received.', QA_TEXTDOMAIN ) . '</span>';
+                        if ( isset( $_GET[ 'flag_received' ] ) ) {
+                                $links[ 'flag' ] = '<span style="color:green">' . __( 'Your report has been received.', QA_TEXTDOMAIN ) . '</span>';
+                        }
 			else if ( isset( $_GET[ 'no_reason' ] ) ) {
 				$links[ 'flag' ] = $flag_link . " " . '<span style="color:red">' . __( 'Please select a reason for reporting.', QA_TEXTDOMAIN ) . '</span>';
 				$show_form		 = true;
@@ -241,16 +255,18 @@ function get_the_qa_action_links( $id ) {
 				$links[ 'flag' ] = $flag_link;
 				$show_form		 = true;
 			}
-		} else
-			$links[ $type ] = _qa_html( 'a', array( 'href' => qa_get_url( $type, $id ) ), $title );
+                        } else {
+                                $links[ $type ] = _qa_html( 'a', array( 'href' => qa_get_url( $type, $id ) ), $title );
+                        }
 	}
 
 	$out = '';
 
 	$out .= '<div class="qa-action-links">';
 	$out .= implode( ' | ', $links );
-	if ( $show_form )
-		$out .= the_qa_flag_form( $id );
+        if ( $show_form ) {
+                $out .= the_qa_flag_form( $id );
+        }
 	$out .= '</div>';
 
 	return $out;
@@ -343,21 +359,25 @@ function the_qa_user_rep( $user_id ) {
   -------------------------------------------------------------- */
 
 function the_question_link( $question_id = 0 ) {
-	global $post;
-	if ( !$question_id )
-		$question_id = $post->ID;
-	if ( !$question_id )
-		$question_id = get_the_ID();
+        global $post;
+        if ( !$question_id ) {
+                $question_id = $post->ID;
+        }
+        if ( !$question_id ) {
+                $question_id = get_the_ID();
+        }
 
 	echo get_question_link( $question_id );
 }
 
 function get_question_link( $question_id = 0 ) {
-	global $post;
-	if ( !$question_id )
-		$question_id = $post->ID;
-	if ( !$question_id )
-		$question_id = get_the_ID();
+        global $post;
+        if ( !$question_id ) {
+                $question_id = $post->ID;
+        }
+        if ( !$question_id ) {
+                $question_id = get_the_ID();
+        }
 
 	if ( !isset( $post ) ) {
 		$post = get_post( $question_id );
@@ -367,11 +387,13 @@ function get_question_link( $question_id = 0 ) {
 }
 
 function get_the_question_score( $question_id = 0, $label = true, $count_class = 'mini-count' ) {
-	global $post;
-	if ( !$question_id )
-		$question_id = $post->ID;
-	if ( !$question_id )
-		$question_id = get_the_ID();
+        global $post;
+        if ( !$question_id ) {
+                $question_id = $post->ID;
+        }
+        if ( !$question_id ) {
+                $question_id = get_the_ID();
+        }
 
 	list( $up, $down ) = qa_get_votes( $question_id );
 
@@ -393,10 +415,11 @@ function the_question_score( $question_id = 0, $label = true, $count_class = 'mi
 }
 
 function get_the_question_voting( $question_id = 0 ) {
-	global $_qa_core;
+        global $_qa_core;
 
-	if ( !$question_id )
-		$question_id = get_the_ID();
+        if ( !$question_id ) {
+                $question_id = get_the_ID();
+        }
 
 	list( $up, $down, $current ) = qa_get_votes( $question_id );
 
@@ -505,17 +528,19 @@ function the_answer_accepted( $answer_id ) {
 
 function get_the_question_status( $question_id = 0, $label = true, $count_class = 'mini-count' ) {
 	global $post;
-	if ( !$question_id )
+	if ( !$question_id ) {
 		$question_id = $post->ID;
+	}
 
 	$count = get_answer_count( $question_id );
 
-	if ( get_post_meta( $question_id, '_accepted_answer', true ) )
+	if ( get_post_meta( $question_id, '_accepted_answer', true ) ) {
 		$status	 = 'answered-accepted';
-	elseif ( $count > 0 )
+	} elseif ( $count > 0 ) {
 		$status	 = 'answered';
-	else
+	} else {
 		$status	 = 'unanswered';
+	}
 
 	$status = apply_filters( 'qa_question_status', $status );
 

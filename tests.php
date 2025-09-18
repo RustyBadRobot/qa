@@ -7,8 +7,9 @@
 function test_rewrites() {
 	global $pagenow;
 	
-	if ( 'index.php' != $pagenow )
+	if ( 'index.php' != $pagenow ) {
 		return;
+	}
 
 	$archives = array(
 		qa_get_url( 'archive' ),
@@ -16,8 +17,9 @@ function test_rewrites() {
 	);
 
 	$tag_id = (int) reset( get_terms( 'question_tag', array( 'fields' => 'ids' ) ) );
-	if ( $tag_id )
+	if ( $tag_id ) {
 		$archives[] = qa_get_url( 'tag', $tag_id );
+	}
 
 	$urls = array(
 		qa_get_url( 'ask' )
@@ -54,8 +56,9 @@ add_action('admin_notices', 'test_rewrites');
 
 function test_templates() {
 	foreach ( array( 'ask', 'edit', 'single', 'archive', 'tag', 'category' ) as $type ) {
-		if ( is_qa_page( $type ) )
+		if ( is_qa_page( $type ) ) {
 			echo( "<pre>$type: true\n</pre>" );
+		}
 	}
 }
 #add_action( 'template_redirect', 'test_templates' );

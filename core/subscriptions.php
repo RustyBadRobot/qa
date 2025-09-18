@@ -7,13 +7,15 @@ class QA_Subscriptions {
 		add_action( 'transition_post_status', array( &$this, 'notify' ), 10, 3 );
 	}
 
-	function get_link( $id, $subscribe_text, $unsubscribe_text ) {
-		if ( !is_user_logged_in() )
-			return;
+        function get_link( $id, $subscribe_text, $unsubscribe_text ) {
+                if ( !is_user_logged_in() ) {
+                        return;
+                }
 
 		// Question authors are automatically subscribed
-		if ( get_current_user_id() == get_post_field( 'post_author', $id ) )
-			return;
+                if ( get_current_user_id() == get_post_field( 'post_author', $id ) ) {
+                        return;
+                }
 
 		$subscribers = get_post_meta( $id, '_sub' );
 
@@ -32,32 +34,38 @@ class QA_Subscriptions {
 		return _qa_html( 'a', $attr, $subscribed ? $unsubscribe_text : $subscribe_text );
 	}
 
-	function handle_subs() {
-		if ( !is_qa_page( 'single' ) )
-			return;
+        function handle_subs() {
+                if ( !is_qa_page( 'single' ) ) {
+                        return;
+                }
 
-		if ( !is_user_logged_in() )
-			return;
+                if ( !is_user_logged_in() ) {
+                        return;
+                }
 
-		if ( !isset( $_GET['_wpnonce'] ) || !wp_verify_nonce( $_GET['_wpnonce'], 'qa_sub' ) )
-			return;
+                if ( !isset( $_GET['_wpnonce'] ) || !wp_verify_nonce( $_GET['_wpnonce'], 'qa_sub' ) ) {
+                        return;
+                }
 
-		// Question authors are automatically subscribed
-		if ( get_current_user_id() == get_post_field( 'post_author', get_queried_object_id() ) )
-			return false;
+                // Question authors are automatically subscribed
+                if ( get_current_user_id() == get_post_field( 'post_author', get_queried_object_id() ) ) {
+                        return false;
+                }
 
-		if ( $_GET['qa_sub'] )
-			add_post_meta( get_queried_object_id(), '_sub', get_current_user_id() );
-		else
-			delete_post_meta( get_queried_object_id(), '_sub', get_current_user_id() );
+                if ( $_GET['qa_sub'] ) {
+                        add_post_meta( get_queried_object_id(), '_sub', get_current_user_id() );
+                } else {
+                        delete_post_meta( get_queried_object_id(), '_sub', get_current_user_id() );
+                }
 	}
 
 	// TODO: use wp-cron
 	function notify( $new_status, $old_status, $post ) {
 		global $current_site;
 
-		if ( 'answer' != $post->post_type || 'publish' != $new_status || $new_status == $old_status )
-			return;
+                if ( 'answer' != $post->post_type || 'publish' != $new_status || $new_status == $old_status ) {
+                        return;
+                }
 
 		$author = get_userdata( $post->post_author );
 
@@ -65,8 +73,9 @@ class QA_Subscriptions {
 		$question = get_post($question_id);
 
 		$subscribers = get_post_meta( $question_id, '_sub' );
-		if ( !in_array( $question->post_author, $subscribers ) )
-			$subscribers[] = $question->post_author; // Notify question author too
+                if ( !in_array( $question->post_author, $subscribers ) ) {
+                        $subscribers[] = $question->post_author; // Notify question author too
+                }
 
 		if( get_option('qa_cc_admin') )	{
 			$admin_ids = new WP_User_Query( array('role' => 'administrator', 'fields' => 'ID') );

@@ -37,15 +37,17 @@ class QA_Edit {
 		$options = get_option( QA_OPTIONS_NAME );
 		$options = is_array( $options ) ? $options : array();
 		// Check if specific plugin option is requested and return it
-		if ( isset( $key ) && array_key_exists( $key, $options ) )
-		return $options[$key];
-		else
-		return $options;
+                if ( isset( $key ) && array_key_exists( $key, $options ) ) {
+                        return $options[$key];
+                } else {
+                        return $options;
+                }
 	}
 
 	function handle_forms() {
-		if ( !isset( $_REQUEST['_wpnonce'] ) )
-		return;
+                if ( !isset( $_REQUEST['_wpnonce'] ) ) {
+                        return;
+                }
 
 		// Handle deletions
 		if ( isset( $_REQUEST['qa_delete'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'qa_delete' ) ) {
@@ -85,16 +87,20 @@ class QA_Edit {
 	function handle_question_editing() {
 		global $wpdb, $qa_general_settings;
 
-		if ( !wp_verify_nonce( $_POST['_wpnonce'], 'qa_edit' ) )
-		wp_die( __( 'Nonce error: It looks like you don\'t have permission to do that.', QA_TEXTDOMAIN ) );
+                if ( !wp_verify_nonce( $_POST['_wpnonce'], 'qa_edit' ) ) {
+                        wp_die( __( 'Nonce error: It looks like you don\'t have permission to do that.', QA_TEXTDOMAIN ) );
+                }
 
 		// Handle captcha
-		if( $qa_general_settings['captcha'] ) {
-			if( ! session_id() ) session_start();
-			$random = strtoupper($_POST['random']);
-			if( $_SESSION['captcha_random_value'] != md5($random))
-			wp_die( __( 'Characters entered do not match the image.  Please use your browser\'s back button to edit your question.', QA_TEXTDOMAIN ) );
-		}
+                if( $qa_general_settings['captcha'] ) {
+                        if( ! session_id() ) {
+                                session_start();
+                        }
+                        $random = strtoupper($_POST['random']);
+                        if( $_SESSION['captcha_random_value'] != md5($random)) {
+                                wp_die( __( 'Characters entered do not match the image.  Please use your browser\'s back button to edit your question.', QA_TEXTDOMAIN ) );
+                        }
+                }
 		$question_id = (int) $_POST['question_id'];
 
 		$question = array(
@@ -102,8 +108,9 @@ class QA_Edit {
 		'post_content' => trim( $_POST['question_content'] ),
 		);
 
-		if ( empty( $question['post_title'] ) || empty( $question['post_content'] ) )
-		wp_die( __( 'Questions must have both a title and a body. Please use your browser\'s back button to edit your question.', QA_TEXTDOMAIN ) );
+                if ( empty( $question['post_title'] ) || empty( $question['post_content'] ) ) {
+                        wp_die( __( 'Questions must have both a title and a body. Please use your browser\'s back button to edit your question.', QA_TEXTDOMAIN ) );
+                }
 
 		// Check for duplicates
 		if ( !$question_id ) {
@@ -132,16 +139,20 @@ class QA_Edit {
 	function handle_answer_editing() {
 		global $wpdb, $qa_general_settings;
 
-		if ( !wp_verify_nonce( $_POST['_wpnonce'], 'qa_answer' ) )
-		wp_die( __( 'Nonce error: It looks like you don\'t have permission to do that.', QA_TEXTDOMAIN ) );
+                if ( !wp_verify_nonce( $_POST['_wpnonce'], 'qa_answer' ) ) {
+                        wp_die( __( 'Nonce error: It looks like you don\'t have permission to do that.', QA_TEXTDOMAIN ) );
+                }
 
 		// Handle captcha
-		if( $qa_general_settings['captcha'] ) {
-			if( ! session_id() ) @session_start();
-			$random = strtoupper($_POST['random']);
-			if( $_SESSION['captcha_random_value'] != md5($random))
-			wp_die( __( 'Characters entered do not match the image.  Please use your browser\'s back button to edit your answer.', QA_TEXTDOMAIN ) );
-		}
+                if( $qa_general_settings['captcha'] ) {
+                        if( ! session_id() ) {
+                                @session_start();
+                        }
+                        $random = strtoupper($_POST['random']);
+                        if( $_SESSION['captcha_random_value'] != md5($random)) {
+                                wp_die( __( 'Characters entered do not match the image.  Please use your browser\'s back button to edit your answer.', QA_TEXTDOMAIN ) );
+                        }
+                }
 
 		$question_id = (int) $_POST['question_id'];
 		$answer_id = (int) $_POST['answer_id'];
@@ -160,11 +171,13 @@ class QA_Edit {
 		'post_status' => 'publish',
 		);
 
-		if ( empty( $answer['post_parent'] ) )
-		wp_die( __( 'Answer must be associated to a question.', QA_TEXTDOMAIN ) );
+                if ( empty( $answer['post_parent'] ) ) {
+                        wp_die( __( 'Answer must be associated to a question.', QA_TEXTDOMAIN ) );
+                }
 
-		if ( empty( $answer['post_content'] ) )
-		wp_die( __( 'You have to actually write something. Please use your browser\'s back button to edit your answer.', QA_TEXTDOMAIN ) );
+                if ( empty( $answer['post_content'] ) ) {
+                        wp_die( __( 'You have to actually write something. Please use your browser\'s back button to edit your answer.', QA_TEXTDOMAIN ) );
+                }
 
 		// Check for duplicates
 		$dup_id = $wpdb->get_var( $wpdb->prepare( "
@@ -200,8 +213,9 @@ class QA_Edit {
 			}
 
 			// Assign an author, if selected so flooding check can work
-			if ( !is_user_logged_in() && 'assign' == $this->g_settings["method"] )
-			$post_args['post_author'] = $this->g_settings["assigned_to"];
+                        if ( !is_user_logged_in() && 'assign' == $this->g_settings["method"] ) {
+                                $post_args['post_author'] = $this->g_settings["assigned_to"];
+                        }
 
 			// Check for flooding
 			$most_recent = $wpdb->get_var( $wpdb->prepare( "
@@ -213,25 +227,28 @@ class QA_Edit {
 			", get_current_user_id() ) );
 
 			$diff = current_time( 'timestamp' ) - strtotime( $most_recent );
-			if ( !current_user_can('manage_options') && $diff < QA_FLOOD_SECONDS )
-			wp_die( __( 'You are posting too fast. Slow down.', QA_TEXTDOMAIN ) );
+                        if ( !current_user_can('manage_options') && $diff < QA_FLOOD_SECONDS ) {
+                                wp_die( __( 'You are posting too fast. Slow down.', QA_TEXTDOMAIN ) );
+                        }
 
-			$v = get_role( 'visitor' );
-			if ( $v && is_object( $v ) && $v->has_cap( 'immediately_publish_questions' ) )
-			$visitor_can_publish = true;
-			else
-			$visitor_can_publish = false;
+                        $v = get_role( 'visitor' );
+                        if ( $v && is_object( $v ) && $v->has_cap( 'immediately_publish_questions' ) ) {
+                                $visitor_can_publish = true;
+                        } else {
+                                $visitor_can_publish = false;
+                        }
 
 			// Find if post will be saved as pending. New in V1.2
 			$post_args = array_merge( $post_args, $defaults );
-			if ( is_user_logged_in() && current_user_can( 'immediately_publish_questions' ) )
-			$post_args['post_status'] = 'publish';
-			else if ( is_user_logged_in() )
-			$post_args['post_status'] = 'pending';
-			else if ( $visitor_can_publish )
-			$post_args['post_status'] = 'publish';
-			else
-			$post_args['post_status'] = 'pending';
+                        if ( is_user_logged_in() && current_user_can( 'immediately_publish_questions' ) ) {
+                                $post_args['post_status'] = 'publish';
+                        } else if ( is_user_logged_in() ) {
+                                $post_args['post_status'] = 'pending';
+                        } else if ( $visitor_can_publish ) {
+                                $post_args['post_status'] = 'publish';
+                        } else {
+                                $post_args['post_status'] = 'pending';
+                        }
 
 			// Create new post
 			$post_args = apply_filters( 'qa_before_insert_post', $post_args );
@@ -244,9 +261,10 @@ class QA_Edit {
 			// Add category
 			$question_category = apply_filters( 'qa_before_add_category', array( (int) @$_POST['question_cat'] ), $post_args );
 			// Assign a default category if selected so
-			if ( ( empty( $question_category ) || -1 == $question_category[0] )
-			&& isset( $this->g_settings["default_category"] ) && $this->g_settings["default_category"] )
-			$question_category = array( $this->g_settings["default_category"] );
+                        if ( ( empty( $question_category ) || -1 == $question_category[0] )
+                        && isset( $this->g_settings["default_category"] ) && $this->g_settings["default_category"] ) {
+                                $question_category = array( $this->g_settings["default_category"] );
+                        }
 			wp_set_post_terms( $post_id, $question_category, 'question_category' );
 
 			$post = get_post( $post_id );
@@ -260,8 +278,9 @@ class QA_Edit {
 			if ( !is_user_logged_in() ) {
 
 				$login_url = site_url( 'wp-login.php', 'login' );
-				if ( get_option( 'users_can_register' ) )
-				$login_url .= '?action=register';
+                                if ( get_option( 'users_can_register' ) ) {
+                                        $login_url .= '?action=register';
+                                }
 
 				$login_url = apply_filters( 'qa_login_url', $login_url );
 
@@ -284,13 +303,14 @@ class QA_Edit {
 					die;
 				}
 			}
-			else if ( 'publish' != $post->post_status ) {
-				wp_redirect( get_permalink( $this->g_settings["thank_you"] ) );
-				die;
-			}
+                        else if ( 'publish' != $post->post_status ) {
+                                wp_redirect( get_permalink( $this->g_settings["thank_you"] ) );
+                                die;
+                        }
 		} else {
-			if ( !current_user_can( 'edit_post', $post_id ) )
-			die( "Cheatin' uh?" );
+                        if ( !current_user_can( 'edit_post', $post_id ) ) {
+                                die( "Cheatin' uh?" );
+                        }
 
 			// Update post
 			$post_args['ID'] = $post_id;
@@ -371,11 +391,12 @@ class QA_Edit {
 		}
 		$notification_subscriptions = apply_filters( 'qa_notified_users', $notification_subscriptions, $post );
 
-		foreach ( (array)$notification_subscriptions as $uid ) {
-			$user_data = get_userdata($uid);
-			if ( $user_data )
-			wp_mail( $user_data->user_email, $subject_content, str_replace( "TO_USER", $user_data->display_name, $message_content ), $message_headers);
-		}
+                foreach ( (array)$notification_subscriptions as $uid ) {
+                        $user_data = get_userdata($uid);
+                        if ( $user_data ) {
+                                wp_mail( $user_data->user_email, $subject_content, str_replace( "TO_USER", $user_data->display_name, $message_content ), $message_headers);
+                        }
+                }
 
 	}
 
@@ -383,35 +404,38 @@ class QA_Edit {
 	function wp_login( $login ) {
 		$post_id = $this->_get_post_to_claim();
 
-		if ( !$post_id )
-		return;
+                if ( !$post_id ) {
+                        return;
+                }
 
 		$user =  get_user_by('login', $login);
 
-		if ( user_can( $user->ID, 'immediately_publish_questions' ) )
-		wp_update_post( array(
-		'ID' => $post_id,
-		'post_author' => $user->ID,
-		'post_status' => 'publish'
-		) );
-		else
-		wp_update_post( array(
-		'ID' => $post_id,
-		'post_author' => $user->ID
-		) );
+                if ( user_can( $user->ID, 'immediately_publish_questions' ) ) {
+                        wp_update_post( array(
+                        'ID' => $post_id,
+                        'post_author' => $user->ID,
+                        'post_status' => 'publish'
+                        ) );
+                } else {
+                        wp_update_post( array(
+                        'ID' => $post_id,
+                        'post_author' => $user->ID
+                        ) );
+                }
 
 		delete_post_meta( $post_id, '_claim' );
 		setcookie( '_qa_claim', false, time() - 3600, '/' );
 
 		// Check if post is published
 		$post = get_post( $post_id );
-		if ( 'publish' == $post->post_status )
-		wp_safe_redirect( qa_get_url( 'single', $post_id ) );
-		else {
-			if ( !$url = get_permalink( $this->g_settings['thank_you'] ) )
-			$url = site_url();
-			wp_redirect( $url );
-		}
+                if ( 'publish' == $post->post_status ) {
+                        wp_safe_redirect( qa_get_url( 'single', $post_id ) );
+                } else {
+                        if ( !$url = get_permalink( $this->g_settings['thank_you'] ) ) {
+                                $url = site_url();
+                        }
+                        wp_redirect( $url );
+                }
 		die;
 	}
 
@@ -419,8 +443,9 @@ class QA_Edit {
 	function user_register( $user_id ) {
 		$post_id = $this->_get_post_to_claim();
 
-		if ( !$post_id )
-		return;
+                if ( !$post_id ) {
+                        return;
+                }
 
 		wp_set_auth_cookie( $user_id, true, is_ssl() );
 
@@ -429,20 +454,22 @@ class QA_Edit {
 		// Manage question claims here
 		$post_id = $this->_get_post_to_claim();
 
-		if ( !$post_id )
-		return;
+                if ( !$post_id ) {
+                        return;
+                }
 
-		if ( user_can( $user->ID, 'immediately_publish_questions' ) )
-		wp_update_post( array(
-		'ID' => $post_id,
-		'post_author' => $user->ID,
-		'post_status' => 'publish'
-		) );
-		else
-		wp_update_post( array(
-		'ID' => $post_id,
-		'post_author' => $user->ID
-		) );
+                if ( user_can( $user->ID, 'immediately_publish_questions' ) ) {
+                        wp_update_post( array(
+                        'ID' => $post_id,
+                        'post_author' => $user->ID,
+                        'post_status' => 'publish'
+                        ) );
+                } else {
+                        wp_update_post( array(
+                        'ID' => $post_id,
+                        'post_author' => $user->ID
+                        ) );
+                }
 
 		delete_post_meta( $post_id, '_claim' );
 		setcookie( '_qa_claim', false, time() - 3600, '/' );
@@ -452,15 +479,17 @@ class QA_Edit {
 	function registration_redirect( $redirect_to ) {
 		$post_id = $this->_get_post_to_claim();
 
-		if ( !$post_id )
-		return;
+                if ( !$post_id ) {
+                        return;
+                }
 
 		// Check if post is published
 		$post = get_post( $post_id );
-		if ( 'publish' == $post->post_status )
-		$url = qa_get_url( 'single', $post_id );
-		else if ( !$url = get_permalink( $this->g_settings['thank_you'] ) )
-		$url = site_url();
+                if ( 'publish' == $post->post_status ) {
+                        $url = qa_get_url( 'single', $post_id );
+                } else if ( !$url = get_permalink( $this->g_settings['thank_you'] ) ) {
+                        $url = site_url();
+                }
 
 		$url = apply_filters('qa_register_redirect', $url, $post_id );
 		return $url;
@@ -470,11 +499,13 @@ class QA_Edit {
 	function login_message( $msg ) {
 		$post_id = $this->_get_post_to_claim();
 
-		if ( !$post_id )
-		return $msg;
+                if ( !$post_id ) {
+                        return $msg;
+                }
 
-		if ( 'register' != @$_GET['action'] )
-		return $msg;
+                if ( 'register' != @$_GET['action'] ) {
+                        return $msg;
+                }
 
 		$text = sprintf( __( 'To finish posting your %s, please register below. If you already have an account, please <a href="%s">login</a> instead.', QA_TEXTDOMAIN ), get_post_type( $post_id ), wp_login_url() );
 
@@ -482,8 +513,9 @@ class QA_Edit {
 	}
 
 	function _get_post_to_claim() {
-		if ( !isset( $_COOKIE['_qa_claim'] ) )
-		return false;
+                if ( !isset( $_COOKIE['_qa_claim'] ) ) {
+                        return false;
+                }
 
 
 		$posts = get_posts( array(
@@ -493,8 +525,9 @@ class QA_Edit {
 		'post_status' => array( 'publish', 'pending' )
 		) );
 
-		if ( empty( $posts ) )
-		return false;
+                if ( empty( $posts ) ) {
+                        return false;
+                }
 
 		return $posts[0]->ID;
 	}
@@ -503,15 +536,17 @@ class QA_Edit {
 	function handle_slugs( $r, $slug, $post_type ) {
 		global $wp_rewrite;
 
-		if ( 'question' == $post_type )
-		return in_array( $slug, array( 'ask', 'unanswered', 'edit', 'tags', $wp_rewrite->pagination_base ) );
+                if ( 'question' == $post_type ) {
+                        return in_array( $slug, array( 'ask', 'unanswered', 'edit', 'tags', $wp_rewrite->pagination_base ) );
+                }
 
-		return $r;
+                return $r;
 	}
 
 	function transition_post_status( $new_status, $old_status, $post ) {
-		if ( $new_status == $old_status )
-		return;
+                if ( $new_status == $old_status ) {
+                        return;
+                }
 
 		$user_id = get_current_user_id();
 
@@ -587,8 +622,9 @@ class QA_Edit {
 
 		$post = get_post( $post_id );
 
-		if ( 'answer' != $post->post_type )
-		return;
+                if ( 'answer' != $post->post_type ) {
+                        return;
+                }
 
 		$question_id = $post->post_parent;
 
@@ -608,8 +644,9 @@ class QA_Edit {
 	// Handle if questions_category is deleted
 	// since 1.4.2
 	function delete_term( $term, $tt_id, $taxonomy ) {
-		if ( 'question_category' != $term->name || $term->term_id != @$this->g_settings["default_category"] )
-		return;
+                if ( 'question_category' != $term->name || $term->term_id != @$this->g_settings["default_category"] ) {
+                        return;
+                }
 
 		// Set as None as our default category is deleted
 		$this->g_settings['default_category'] = 0;
