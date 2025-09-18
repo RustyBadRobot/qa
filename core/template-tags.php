@@ -8,10 +8,11 @@
   -------------------------------------------------------------- */
 
 function get_the_qa_menu() {
-	global $user_ID, $wp;
+	global $wp;
+	$user_id = get_current_user_id();
 	$menu = array();
 
-	if ( ($user_ID == 0 && qa_visitor_can( 'read_questions' )) || current_user_can( 'read_questions' ) ) {
+	if ( ($user_id == 0 && qa_visitor_can( 'read_questions' )) || current_user_can( 'read_questions' ) ) {
 		$menu[]	 = array(
 			'title'		 => __( 'Questions', QA_TEXTDOMAIN ),
 			'type'		 => 'archive',
@@ -24,7 +25,7 @@ function get_the_qa_menu() {
 		);
 	}
 
-	if ( ($user_ID == 0 && qa_visitor_can( 'publish_questions' )) || current_user_can( 'publish_questions' ) ) {
+	if ( ($user_id == 0 && qa_visitor_can( 'publish_questions' )) || current_user_can( 'publish_questions' ) ) {
 		$menu[] = array(
 			'title'		 => __( 'Ask a Question', QA_TEXTDOMAIN ),
 			'type'		 => 'ask',
@@ -657,13 +658,14 @@ function the_answer_count( $question_id = 0 ) {
 }
 
 function get_the_answer_list() {
-	global $user_ID, $post;
+	global $post;
+	$user_id = get_current_user_id();
 	$question_id = $post->ID;
 
 	if ( post_password_required( $post ) )
 		return;
 
-	if ( ($user_ID == 0 && !qa_visitor_can( 'read_answers', $question_id )) && !current_user_can( 'read_answers', $question_id ) )
+	if ( ($user_id == 0 && !qa_visitor_can( 'read_answers', $question_id )) && !current_user_can( 'read_answers', $question_id ) )
 		return;
 
 	$accepted_answer = get_post_meta( $question_id, '_accepted_answer', true );
@@ -722,11 +724,15 @@ function the_answer_list() {
 }
 
 function get_the_answer_form() {
-	global $wp, $wp_query, $user_ID, $wp_version, $qa_general_settings, $post;
+	global $wp, $wp_query, $wp_version, $qa_general_settings, $post;
+	$user_id = get_current_user_id();
 
-	//if(!isset($post)){
-	$post = get_post( (int) $wp->query_vars[ 'qa_edit' ] );
-	//}
+	if ( isset( $wp->query_vars[ 'qa_edit' ] ) ) {
+		$post = get_post( (int) $wp->query_vars[ 'qa_edit' ] );
+	} else {
+		$out .= '<p>' . __( 'You are not allowed to add answers!', QA_TEXTDOMAIN ) . '</p>';
+		return;
+	}
 
 	if ( post_password_required( $post ) )
 		return;
@@ -736,10 +742,10 @@ function get_the_answer_form() {
 	if ( isset( $wp->query_vars[ 'qa_edit' ] ) ) {
 		$answer = $post;
 
-		if ( ($user_ID == 0 && !qa_visitor_can( 'edit_published_answers', $answer->ID )) && !current_user_can( 'edit_published_answers', $answer->ID ) )
+		if ( ($user_id == 0 && !qa_visitor_can( 'edit_published_answers', $answer->ID )) && !current_user_can( 'edit_published_answers', $answer->ID ) )
 			return;
 	} else {
-		//if ( ($user_ID == 0 && !qa_visitor_can( 'publish_answers' )) && !current_user_can( 'publish_answers' ) ) {
+		//if ( ($user_id == 0 && !qa_visitor_can( 'publish_answers' )) && !current_user_can( 'publish_answers' ) ) {
 		if ( !current_user_can( 'publish_answers' ) ) {
 			$out .= '<p>' . __( 'You are not allowed to add answers!', QA_TEXTDOMAIN ) . '</p>';
 			return;
@@ -775,10 +781,11 @@ function get_the_answer_form() {
 		ob_end_clean();
 
 		$out .= '</p>';
-	} else
+	} else {
 		$out .= '<p><textarea name="answer" class="wp32">' . esc_textarea( $answer->post_content ) . '</textarea></p>';
+	}
 
-	if ( $qa_general_settings[ 'captcha' ] ) {
+	if ( ! empty( $qa_general_settings[ 'captcha' ] ) ) {
 		$out .= sprintf( '<label><img src="%s" style="vertical-align:top" /> <input type="text" name="random" placeholder="%s"/></label> ', QA_PLUGIN_URL . 'default-templates/captcha-image.php', __( 'Enter letters in image', QA_TEXTDOMAIN ) );
 	}
 

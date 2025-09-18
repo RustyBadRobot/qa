@@ -5,7 +5,10 @@
 */
 class QA_Edit {
 
-	function __construct() {
+	// Declare classes properties
+    public $g_settings;
+
+	public function __construct() {
 		$this->g_settings = $this->get_options('general_settings');
 
 		add_action( 'init', array( &$this, 'handle_forms' ), 11 );
@@ -510,9 +513,9 @@ class QA_Edit {
 		if ( $new_status == $old_status )
 		return;
 
-		global $user_ID;
+		$user_id = get_current_user_id();
 
-		$current_user = get_userdata( $user_ID );
+		$current_user = get_userdata( $user_id );
 		$this->update_answer_count( $post->ID );
 
 		if ( 'answer' == $post->post_type && 'publish' == $new_status ) {
@@ -527,7 +530,7 @@ class QA_Edit {
 
 				$activity_id = bp_activity_add( array(
 				'id' => get_post_meta($post->ID, '_bp_activity_id', true),
-				'user_id' => $user_ID,
+				'user_id' => $user_id,
 				'action' => $action,
 				'primary_link' => get_permalink($post->ID),
 				'component' => 'qa',
@@ -552,7 +555,7 @@ class QA_Edit {
 
 				$activity_id = bp_activity_add( array(
 				'id' => get_post_meta($post->ID, '_bp_activity_id', true),
-				'user_id' => $user_ID,
+				'user_id' => $user_id,
 				'action' => $action,
 				'primary_link' => get_permalink($post->ID),
 				'component' => 'qa',
