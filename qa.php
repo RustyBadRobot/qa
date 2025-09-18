@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Q&A - WordPress Questions and Answers Plugin
-Plugin URI: http://premium.wpmudev.org/project/qa-wordpress-questions-and-answers-plugin
+Plugin URI: https://widgetmedia.co/qa-wordpress-questions-and-answers-plugin
 Description: Q&A allows any WordPress site to have a fully featured questions and answers section - just like StackOverflow, Yahoo Answers, Quora and more...
 Author: WPMU DEV
-Version: 1.4.5.2-beta
-Author URI: http://premium.wpmudev.org/
+Version: 1.5
+Author URI: https://widgetmedia.co/
 WDP ID: 217
 Text Domain: qa
 */
@@ -99,11 +99,6 @@ if ( !class_exists( 'QA_Core' ) ) {
 	include_once QA_PLUGIN_DIR . 'core/widgets.php';
 	include_once QA_PLUGIN_DIR . 'core/ajax.php';
 	include_once QA_PLUGIN_DIR . 'core/class.virtualpage.php';
-	
-	function qa_bp_integration() {
-		include_once QA_PLUGIN_DIR . 'core/buddypress.php';
-	}
-	add_action( 'bp_loaded', 'qa_bp_integration' );
 
 	if ( is_admin() ) {
 		include_once QA_PLUGIN_DIR . 'core/admin.php';
