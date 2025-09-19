@@ -1,22 +1,34 @@
 <?php get_header( 'question' ); ?>
-<div id="qa-page-wrapper">
-	<div id="qa-content-wrapper">
-		<?php do_action( 'qa_before_content', 'archive-question' ); ?>
+<div class="jumbotron">
+    <div class="container">
+        <h1 class="page-title">Deck Detective Questions</h1>
+        <div class="archive-description">
+            <p>Help track down decks and explore the questions asked by our members.</p>
+        </div>
+    </div>
+</div>
+<section id="primary" class="content-area">
+    <div id="main" class="site-main" role="main">
+        <div class="container">
+            <div class="row">
+				<div id="qa-page-wrapper">
+					<div id="qa-content-wrapper">
+						<?php do_action( 'qa_before_content', 'archive-question' ); ?>
 
-		<?php the_qa_error_notice(); ?>
-		<?php the_qa_menu(); ?>
+						<?php the_qa_error_notice(); ?>
+						<?php the_qa_menu(); ?>
 
-		<?php if ( !have_posts() ) : ?>
+						<?php if ( !have_posts() ) : ?>
 
-			<p><?php $question_ptype = get_post_type_object( 'question' ); echo $question_ptype->labels->not_found; ?></p>
+							<p><?php $question_ptype = get_post_type_object( 'question' ); echo $question_ptype->labels->not_found; ?></p>
 
-		<?php else: ?>
-<?php
-global $wp_query;
+						<?php else: ?>
+				<?php
+				global $wp_query;
 
-single_cat_title('Category: ');
+				single_cat_title('Category: ');
 
-?>
+				?>
 			<div id="question-list">
 			<?php while ( have_posts() ) : the_post(); ?>
 				<?php do_action( 'qa_before_question_loop' ); ?>
@@ -52,6 +64,10 @@ single_cat_title('Category: ');
 		<?php endif;?>
 	</div>
 </div><!--#qa-page-wrapper-->
+</div><!-- .row -->
+        </div><!-- .container -->
+    </div><!-- #main -->
+</section><!-- #primary -->
 <?php
 global $qa_general_settings;
 

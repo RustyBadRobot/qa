@@ -178,11 +178,6 @@ class QA_Core {
 
 			$random = strtoupper( $_POST['random'] );
 
-			//			include_once WP_PLUGIN_DIR . '/qa/securimage/securimage.php';
-			//			$securimage = new Securimage();
-			//
-			//			if ($securimage->check($_POST['captcha_code']) == false) {
-
 			if ( $_SESSION['captcha_random_value'] != md5( $random ) ) {
 				$url = add_query_arg( array( 'flag_error' => '1' . $anchor ), get_permalink( $id ) );
 				wp_redirect( $url );

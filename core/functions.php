@@ -76,10 +76,8 @@ function qa_get_url( $type, $id = 0 ) {
 			}
 			$user = get_userdata( $id );
 			if ( $user ) {
-				if ( defined( 'BP_VERSION' ) ) {
-
-				}
-				$result = trailingslashit( $base ) . user_trailingslashit( QA_SLUG_USER . '/' . $user->user_nicename );
+				$user_slug = get_user_meta($user->ID, 'public_slug', true) ?: $user->user_nicename;
+				$result = get_site_url() . user_trailingslashit( '/' . QA_SLUG_USER . '/' . $user_slug );
 			}
 			break;
 		case 'single':

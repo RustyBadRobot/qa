@@ -303,18 +303,6 @@ function the_qa_flag_form( $id ) {
 	if ( isset( $qa_general_settings[ "captcha" ] ) && $qa_general_settings[ "captcha" ] && qa_is_captcha_usable() ) {
 
 		$f .= sprintf( '<br/><label class="qa_captcha"><img src="%s" style="vertical-align:top" /> <input type="text" name="random" placeholder="%s"/></label> ', QA_PLUGIN_URL . 'default-templates/captcha-image.php', __( 'Enter letters in image', QA_TEXTDOMAIN ) );
-
-
-//		$f .= '<div class="qa_captcha">
-//		<label class="description" >' . __('Type the letters you see in the image below:',QA_TEXTDOMAIN ). '</label>
-//		<div class="qa_captcha_inner">
-//		<img class="captcha_image" id="captcha_'.$id.'" src="' . plugins_url( "/qa/securimage/securimage_show.php" ). '" alt="CAPTCHA Image" />
-//		</div>
-//		<div>
-//		<input type="text" id="captcha_code_'.$id.'" name="captcha_code" size="10" maxlength="6" />
-//		<a href="javascript:void(0)" onclick="document.getElementsByClassName(\'captcha_image\').src=\'' . plugins_url( "/qa/securimage/images/blank.png" ). '\';document.getElementById(\'captcha_'.$id.'\').src = \''. plugins_url( "/qa/securimage/securimage_show.php") . '?\' + Math.random(); document.getElementById(\'captcha_code_'.$id.'\').value=\'\'; return false;">'. __('[ Different Image ]',QA_TEXTDOMAIN ). '</a>
-//		</div>
-//		</div>';
 	}
 	$f .= '<input type="submit" value="' . __( 'Send Report', QA_TEXTDOMAIN ) . '" />';
 	$f .= '</form>';
@@ -383,7 +371,7 @@ function get_question_link( $question_id = 0 ) {
 		$post = get_post( $question_id );
 	}
 
-	return apply_filters( 'qa_get_question_link', _qa_html( 'a', array( 'class' => 'question-link', 'href' => qa_get_url( 'single', $question_id ) ), $post->post_title ) );
+	return apply_filters( 'qa_get_question_link', _qa_html( 'a', array( 'class' => 'question-link', 'href' => qa_get_url( 'single', $question_id ) ), $post->post_content ) );
 }
 
 function get_the_question_score( $question_id = 0, $label = true, $count_class = 'mini-count' ) {
@@ -609,11 +597,6 @@ function get_the_question_form() {
 	$out .= '<input type="hidden" name="qa_action" value="edit_question" />';
 	$out .= '<input type="hidden" name="question_id" value="' . esc_attr( $question->ID ) . '" />';
 
-	$out .= '<div id="question-form-table">';
-	$out .= '<div id="question-title-td">';
-	$out .= '<input type="text" id="question-title" name="question_title" placeholder="' . esc_attr( __( 'Question Title', QA_TEXTDOMAIN ) ) . '" value="' . esc_attr( $question->post_title ) . '" />';
-	$out .= '</div></div>';
-
 	$use_editor	 = true;
 	if ( isset( $qa_general_settings[ "disable_editor" ] ) && $qa_general_settings[ "disable_editor" ] )
 		$use_editor	 = false;
@@ -624,25 +607,11 @@ function get_the_question_form() {
 		wp_editor( $question->post_content, 'question_content', $wp_editor_settings );
 		$out .= ob_get_contents();
 		ob_end_clean();
-	} else
+	} else {
 		$out .= '<textarea name="question_content" class="wp32">' . esc_textarea( $question->post_content ) . '</textarea>';
+	}
 
-	$out .= '
-	<div id="question-category">';
-	$out .= wp_dropdown_categories( array(
-		'orderby'			 => 'name',
-		'order'				 => 'ASC',
-		'taxonomy'			 => 'question_category',
-		'selected'			 => $question->cat,
-		'hide_empty'		 => false,
-		'hierarchical'		 => true,
-		'name'				 => 'question_cat',
-		'class'				 => '',
-		'show_option_none'	 => __( 'Select category...', QA_TEXTDOMAIN ),
-		'echo'				 => 0
-	) );
-	$out .= '</div>
-	<div id="question-tags">
+	$out .= '<div id="question-tags">
 	<input type="text" id="question-tags" name="question_tags" placeholder="' . esc_attr( __( 'Tags:', QA_TEXTDOMAIN ) ) . '" value="' . implode( ', ', $question->tags ) . '" />
 	</div>';
 
@@ -759,8 +728,9 @@ function get_the_answer_form() {
 		return;
 	}
 
-	if ( post_password_required( $post ) )
+	if ( post_password_required( $post ) ) {
 		return;
+	}
 
 	$out = '';
 

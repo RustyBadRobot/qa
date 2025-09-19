@@ -104,11 +104,10 @@ class QA_Edit {
 		$question_id = (int) $_POST['question_id'];
 
 		$question = array(
-		'post_title' => trim( wp_strip_all_tags( $_POST['question_title'] ) ),
-		'post_content' => trim( $_POST['question_content'] ),
+			'post_content' => trim( $_POST['question_content'] ),
 		);
 
-                if ( empty( $question['post_title'] ) || empty( $question['post_content'] ) ) {
+                if ( empty( $question['post_content'] ) ) {
                         wp_die( __( 'Questions must have both a title and a body. Please use your browser\'s back button to edit your question.', QA_TEXTDOMAIN ) );
                 }
 
@@ -119,7 +118,7 @@ class QA_Edit {
 			FROM $wpdb->posts
 			WHERE post_type = 'question'
 			AND post_status = 'publish'
-			AND (post_title = %s OR post_content = %s)
+			AND (post_content = %s)
 			LIMIT 1
 			", $question['post_title'], $question['post_content'] ) );
 
