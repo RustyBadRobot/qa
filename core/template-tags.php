@@ -718,21 +718,21 @@ function the_answer_list() {
 }
 
 function get_the_answer_form() {
-	global $wp, $wp_query, $wp_version, $qa_general_settings, $post;
-	$user_id = get_current_user_id();
+        global $wp, $wp_query, $wp_version, $qa_general_settings, $post;
+        $user_id = get_current_user_id();
+        $out     = '';
 
-	if ( isset( $wp->query_vars[ 'qa_edit' ] ) ) {
-		$post = get_post( (int) $wp->query_vars[ 'qa_edit' ] );
-	} else {
-		$out .= '<p>' . __( 'You are not allowed to add answers!', QA_TEXTDOMAIN ) . '</p>';
-		return;
-	}
+        if ( isset( $wp->query_vars[ 'qa_edit' ] ) ) {
+                $post = get_post( (int) $wp->query_vars[ 'qa_edit' ] );
 
-	if ( post_password_required( $post ) ) {
-		return;
-	}
+                if ( ! $post ) {
+                        return;
+                }
+        }
 
-	$out = '';
+        if ( post_password_required( $post ) ) {
+                return;
+        }
 
 	if ( isset( $wp->query_vars[ 'qa_edit' ] ) ) {
 		$answer = $post;
