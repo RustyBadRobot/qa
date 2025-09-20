@@ -597,6 +597,20 @@ function get_the_question_form() {
 	$out .= '<input type="hidden" name="qa_action" value="edit_question" />';
 	$out .= '<input type="hidden" name="question_id" value="' . esc_attr( $question->ID ) . '" />';
 
+	if ( ! is_user_logged_in() ) {
+		$anon_name  = isset( $_POST['qa_anon_name'] ) ? sanitize_text_field( wp_unslash( $_POST['qa_anon_name'] ) ) : '';
+		$anon_email = isset( $_POST['qa_anon_email'] ) ? sanitize_email( wp_unslash( $_POST['qa_anon_email'] ) ) : '';
+
+		$anon_fields  = '<div class="qa-anonymous-fields">';
+		$anon_fields .= '<p class="qa-anonymous-name"><label for="qa-anon-name">' . esc_html__( 'Your Name', QA_TEXTDOMAIN ) . '</label> ';
+		$anon_fields .= '<input type="text" id="qa-anon-name" name="qa_anon_name" value="' . esc_attr( $anon_name ) . '" /></p>';
+		$anon_fields .= '<p class="qa-anonymous-email"><label for="qa-anon-email">' . esc_html__( 'Your Email', QA_TEXTDOMAIN ) . '</label> ';
+		$anon_fields .= '<input type="email" id="qa-anon-email" name="qa_anon_email" value="' . esc_attr( $anon_email ) . '" /></p>';
+		$anon_fields .= '</div>';
+
+		$out .= apply_filters( 'qa_anonymous_submission_fields', $anon_fields, $anon_name, $anon_email );
+	}
+
 	$use_editor	 = true;
 	if ( isset( $qa_general_settings[ "disable_editor" ] ) && $qa_general_settings[ "disable_editor" ] )
 		$use_editor	 = false;

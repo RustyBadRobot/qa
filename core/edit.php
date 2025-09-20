@@ -7,6 +7,7 @@ class QA_Edit {
 
 	// Declare classes properties
     public $g_settings;
+	protected $anonymous_submission = array();
 
 	public function __construct() {
 		$this->g_settings = $this->get_options('general_settings');
@@ -102,6 +103,20 @@ class QA_Edit {
                         }
                 }
 		$question_id = (int) $_POST['question_id'];
+
+		$this->anonymous_submission = array();
+
+		if ( ! is_user_logged_in() ) {
+			$name  = isset( $_POST['qa_anon_name'] ) ? sanitize_text_field( wp_unslash( $_POST['qa_anon_name'] ) ) : '';
+			$email = isset( $_POST['qa_anon_email'] ) ? sanitize_email( wp_unslash( $_POST['qa_anon_email'] ) ) : '';
+			$ip    = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+
+			$this->anonymous_submission = array(
+				'name'  => $name,
+				'email' => $email,
+				'ip'    => $ip,
+			);
+		}
 
 		$question = array(
 			'post_content' => trim( $_POST['question_content'] ),
@@ -204,6 +219,11 @@ class QA_Edit {
 	function _insert_post( $post_id, $post_args, $defaults ) {
 		if ( !$post_id ) {
 			global $wpdb, $qa_email_notification_content, $qa_email_notification_subject, $current_site;
+			$is_question = false;
+
+			if ( ( isset( $defaults['post_type'] ) && 'question' === $defaults['post_type'] ) || ( isset( $post_args['post_type'] ) && 'question' === $post_args['post_type'] ) ) {
+				$is_question = true;
+			}
 
 			if (!isset($current_site)) {
 				$_url = get_bloginfo('url');
@@ -211,10 +231,12 @@ class QA_Edit {
 				$current_site = (object) array('domain' => $_domain_parts[2]);
 			}
 
-			// Assign an author, if selected so flooding check can work
-                        if ( !is_user_logged_in() && 'assign' == $this->g_settings["method"] ) {
-                                $post_args['post_author'] = $this->g_settings["assigned_to"];
-                        }
+			// Assign an author for anonymous submissions so flooding check can work
+			if ( $is_question && !is_user_logged_in() ) {
+				$post_args['post_author'] = 0;
+			} elseif ( !is_user_logged_in() && isset( $this->g_settings["method"] ) && 'assign' == $this->g_settings["method"] ) {
+				$post_args['post_author'] = isset( $this->g_settings["assigned_to"] ) ? $this->g_settings["assigned_to"] : 0;
+			}
 
 			// Check for flooding
 			$most_recent = $wpdb->get_var( $wpdb->prepare( "
@@ -239,19 +261,33 @@ class QA_Edit {
 
 			// Find if post will be saved as pending. New in V1.2
 			$post_args = array_merge( $post_args, $defaults );
-                        if ( is_user_logged_in() && current_user_can( 'immediately_publish_questions' ) ) {
-                                $post_args['post_status'] = 'publish';
-                        } else if ( is_user_logged_in() ) {
-                                $post_args['post_status'] = 'pending';
-                        } else if ( $visitor_can_publish ) {
-                                $post_args['post_status'] = 'publish';
-                        } else {
-                                $post_args['post_status'] = 'pending';
-                        }
+			if ( $is_question && !is_user_logged_in() ) {
+				$post_args['post_status'] = 'pending';
+			} elseif ( is_user_logged_in() && current_user_can( 'immediately_publish_questions' ) ) {
+				$post_args['post_status'] = 'publish';
+			} else if ( is_user_logged_in() ) {
+				$post_args['post_status'] = 'pending';
+			} else if ( $visitor_can_publish ) {
+				$post_args['post_status'] = 'publish';
+			} else {
+				$post_args['post_status'] = 'pending';
+			}
 
 			// Create new post
 			$post_args = apply_filters( 'qa_before_insert_post', $post_args );
 			$post_id = wp_insert_post( $post_args, true );
+
+			if ( $is_question && !is_user_logged_in() && ! empty( $this->anonymous_submission ) ) {
+				if ( ! is_wp_error( $post_id ) ) {
+					foreach ( $this->anonymous_submission as $meta_key => $meta_value ) {
+						if ( '' === $meta_value ) {
+							continue;
+						}
+						update_post_meta( $post_id, '_qa_anonymous_' . $meta_key, $meta_value );
+					}
+				}
+				$this->anonymous_submission = array();
+			}
 
 			// Add tags
 			$question_tag = apply_filters( 'qa_before_add_tag', @$_POST['question_tags'], $post_args );
